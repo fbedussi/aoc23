@@ -30,7 +30,7 @@ const isNearSymbol = (number, indexX, indexY) => {
 
 let number = []
 lines.forEach((line, indexY) => {
-  line.split('').forEach((char, indexX) => {
+  line.split('').concat('.').forEach((char, indexX) => {
     if (char.match(/[0-9]/)) {
       number.push(char)
     } else {
