@@ -1,6 +1,6 @@
 import fs from 'fs'
 
-const test = true
+const test = false
 
 const inputTxt = fs.readFileSync(test ? './input-test.txt' : './input.txt', 'utf-8')
 
@@ -25,31 +25,51 @@ const maps = lines.slice(1).reduce((result, line) => {
   return result
 }, [])
 
-const locations = seeds.map(seed => {
-  return maps.reduce((result, map) => {
-    const [resultStart, resultLength] = result
-    const found = map
-      .filter(([destination, source, length]) => resultStart >= source && resultStart <= source + length)
-      .map(([destination, source, length]) => {
-        const start = Math.max(source, resultStart) - source + destination
-        const length2 = Math.min(resultLength, source + length - Math.max(source, resultStart))
-        return [start, length2]
-      })
 
-    if (found.length > 1) {
-      throw new Error('Unexpected length', found.length)
-    }
+let inputs = seeds
+let step = 0
+while (step < maps.length) {
+  const map = maps[step]
+  let output = []
+  inputs.forEach(([inputStart, inputLength]) => {
+    const founds = map
+      .filter(([destination, source, length]) => inputStart <= source + length && (inputStart + inputLength) >= source)
 
-    if (found.length === 1) {
-      return found[0]
+    if (founds.length === 0) {
+      output.push([inputStart, inputLength])
     } else {
-      return result
+      founds.forEach(found => {
+        const [destination, source, length] = found
+
+        const preLength = source - inputStart
+        if (preLength > 0) {
+          output.push([inputStart, preLength])
+          inputStart = source
+          inputLength -= preLength
+        }
+
+        const postLength = (inputStart + inputLength) - (source + length)
+        if (postLength > 0) {
+          output.push([source + length, postLength])
+          inputLength -= postLength
+        }
+
+        if (inputLength > 0) {
+          output.push([destination + (inputStart - source), inputLength])
+        }
+      })
     }
-  }, seed)
-})
+  })
 
-const lowest = locations.map(range => range[0])
+  inputs = output
+  step++
+}
 
-const result = Math.min(...lowest)
+const starts = inputs.map(range => range[0])
+
+const result = Math.min(...starts)
 
 console.log(result)
+
+// 7623322
+// hight
