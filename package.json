@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/fbedussi/aoc23#readme",
   "dependencies": {
+    "geometric": "^2.5.4",
     "mathjs": "^12.1.0"
   }
 }
